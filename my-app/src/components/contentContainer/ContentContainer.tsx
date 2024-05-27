@@ -4,7 +4,7 @@ import { ReactNode, FC } from 'react';
 const Container = styled.div`
   display: block;
   margin: 0 auto;
-  width: 100%;
+  width: 102.4rem;
   height: 100%;`;
 
 interface ContentContainerProps {
