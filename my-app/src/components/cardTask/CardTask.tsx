@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import { DeleteOutlined, HeartOutlined, CheckOutlined } from '@ant-design/icons';
-
+import { ITask } from '../../lib/types';
+import { FC } from 'react';
+import { useTaskStore } from '../../store/taskStore';
 
 const Task = styled.div`
   display: flex;
@@ -30,25 +32,35 @@ const TaskButton = styled.button`
   font-size: 2rem;
   cursor: pointer`;
 
-const CardTask = () => {
+interface CardTaskProps {
+  task: ITask;
+}
+
+const CardTask: FC<CardTaskProps> = ({ task }) => {
+
+  const {
+    removeTask,
+    changeFavorite,
+    changeStatus
+  } = useTaskStore();
 
   return (
     <Task>
       <TaskHeader>
-        Title
+        {task.attributes.title}
         <div>
           <TaskButton>
-            <HeartOutlined style={{ color: '#FFD700' }} />
+            <HeartOutlined onClick={() => changeFavorite(task.id)} style={{ color: task.favorite == 'favorite' ? '#FFD700' : '#000000' }} />
           </TaskButton>
           <TaskButton>
-            <CheckOutlined style={{ color: '#228B22' }} />
+            <CheckOutlined onClick={() => changeStatus(task.id)} style={{ color: task.attributes.status !== 'active' ? '#228B22' : '#000000' }} />
           </TaskButton>
           <TaskButton>
-            <DeleteOutlined style={{ color: '#FF0000' }} />
+            <DeleteOutlined style={{ color: '#FF0000' }} onClick={() => removeTask(task.id)} />
           </TaskButton>
         </div>
       </TaskHeader>
-      hkfsdkjf
+      {task.attributes.description}
     </Task>
   );
 }

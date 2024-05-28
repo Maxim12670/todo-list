@@ -12,9 +12,6 @@ export interface ITask {
 
 export interface ITaskList {
   tasks: ITask[];
-  onChangeFavorite: (id: number) => void;
-  onChangeStatus: (id: number) => void;
-  onDeleteTask: (id: number) => void;
 }
 
 export type TFilterTask = 'all' | 'active' | 'completed' | 'favorite' | 'notfavorite';
