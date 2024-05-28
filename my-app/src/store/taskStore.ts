@@ -1,14 +1,14 @@
 import { create } from "zustand";
 import { ITask, TFilterTask } from "../lib/types";
-import { getTasksAsync } from "../service/api";
+import { deleteTaskAsync, getTasksAsync, postTaskAsync } from "../service/api";
 
 interface TaskStore {
   tasks: ITask[];
   filter: TFilterTask;
   setFilter: (filter: TFilterTask) => void;
   getTasks: () => Promise<void>;
-  addNewTask: (title: string, description: string) => void;
-  removeTask: (id: number) => void;
+  addNewTask: (title: string, description: string, status: string) => Promise<void>;
+  removeTask: (id: number) => Promise<void>;
   changeStatus: (id: number) => void;
   changeFavorite: (id: number) => void;
   getFilteredTasks: () => ITask[];
@@ -29,18 +29,15 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }
   },
 
-  addNewTask: (title, description) => set((state) => {
-    const lengthTasks: number = state.tasks.length;
-    const id = state.tasks[lengthTasks - 1].id + 1;
-    const newTask: ITask = {
-      id: id,
-      attributes: {
-        title, description, status: 'active'
-      },
-      favorite: 'notfavorite'
-    };
-    return { tasks: [...state.tasks, newTask] };
-  }),
+  addNewTask: async (title, description, status) => {
+    try {
+      await postTaskAsync(title, description, status);
+      const { getTasks } = useTaskStore.getState();
+      getTasks();
+    } catch (error) {
+      console.log('Ошибка в сторе при отправке задачи:', error);
+    }
+  },
 
   changeStatus: (id) =>
     set((state) => ({
@@ -54,16 +51,22 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         } : task
       ))
     })),
-  changeFavorite: (id) =>
+  changeFavorite: (id: number) =>
     set((state) => ({
       tasks: state.tasks.map((task) => (
         task.id === id ? { ...task, favorite: task.favorite == 'favorite' ? 'notfavorite' : 'favorite' } : task
       ))
     })),
-  removeTask: (id) =>
-    set((state) => ({
-      tasks: state.tasks.filter((task) => (task.id !== id))
-    })),
+  removeTask: async (id: number) => {
+    try {
+      await deleteTaskAsync(id);
+      set((state) => ({
+        tasks: state.tasks.filter((task) => task.id !== id)
+      }))
+    } catch (error) {
+      console.log('Произошла ошибка в сторе при удалении задачи:', error);
+    }
+  },
   getFilteredTasks: () => {
     const { tasks, filter } = get();
     switch (filter) {

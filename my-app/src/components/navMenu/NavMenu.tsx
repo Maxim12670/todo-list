@@ -28,7 +28,7 @@ const NavMenu: FC<NavMenuProps> = ({ onChangeFilter }) => {
   }
 
   const addTask = () => {
-    addNewTask(title, description);
+    addNewTask(title, description, 'active');
   }
 
 
